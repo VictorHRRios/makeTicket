@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -22,17 +23,17 @@ func (c Config) createFiles(project, version string) error {
 	log.Printf("Created file %s\n", ticketPMEmpty.path)
 
 	if err := c.fillTemplatePM(ticketPMEmpty.file); err != nil {
-		return err
+		return errors.New("fillTemplate: " + err.Error())
 	}
 
 	metadata, err := createFileInPath(ticketDir, ".config")
 	if err != nil {
-		return err
+		return errors.New("createFileInPath: " + err.Error())
 	}
 	defer metadata.file.Close()
 	_, err = fmt.Fprintf(metadata.file, "ticket,project,version\n%s,%s,%s", c.TicketNumber, project, version)
 	if err != nil {
-		return err
+		return errors.New("closeFile: " + err.Error())
 	}
 	return nil
 }

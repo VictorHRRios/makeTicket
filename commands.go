@@ -174,11 +174,11 @@ func (c Config) xml(s string) (string, error) {
 	//if c.Status < 1 {
 	//return "", fmt.Errorf("To edit the XML you need to be in a PM directory")
 	//}
-	ticketDir := filepath.Join(c.Path, c.TicketNumber+".txt")
+	ticketDir := filepath.Join(c.Path, c.TicketNumber+".xml")
 
 	_, err := os.Stat(ticketDir)
 	if errors.Is(err, os.ErrNotExist) {
-		_, err = createFileInPath("./", ticketDir)
+		_, err := os.Create(ticketDir)
 		if err != nil {
 			return "", err
 		}

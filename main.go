@@ -12,17 +12,57 @@ import (
 	"time"
 )
 
+const configFileName = "config.json"
+
 func configPath() string {
-	if dir, err := os.UserConfigDir(); err == nil {
-		return filepath.Join(dir, "makeTicket", "config.json")
+	cfgDir, err := os.UserConfigDir()
+	if err != nil {
+		cfgDir = "."
+	} else {
+		cfgDir = filepath.Join(cfgDir, "makeTicket")
 	}
-	return "config.json"
+
+	fileCfgDir := filepath.Join(cfgDir, configFileName)
+
+	_, err = os.Stat(fileCfgDir)
+	if errors.Is(err, os.ErrNotExist) {
+		err := os.MkdirAll(cfgDir, 0755)
+		if err != nil {
+			log.Fatalf("Failed to create directories: %v", err)
+		}
+		file, err := os.Create(fileCfgDir)
+		if err != nil {
+			log.Fatalf("Failed to create cfg dir: %v", err)
+		}
+		file.Write([]byte(`
+{
+    "projects": {
+        "tcaOffshoreLib": {
+            "name": "",
+            "svnProjectURL": "",
+            "ProjectID": 0
+        }
+    },
+    "versions": {
+        "8.3": {
+            "evidenceURL": "",
+            "svnURL": ""
+        }
+    },
+    "current": "0012345",
+    "cloudURL": "sharepoint",
+    "templatePath": "config"
+}
+`))
+	}
+
+	return cfgDir
 }
 
 func getJSONConfig() (ConfigFile, error) {
 	config := ConfigFile{}
 	cfgPath := configPath()
-	data, err := os.ReadFile(cfgPath)
+	data, err := os.ReadFile(filepath.Join(cfgPath, configFileName))
 	if err != nil {
 		return ConfigFile{}, err
 	}
@@ -42,7 +82,7 @@ func UpdateJSONConfig(ticketNumber string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(configPath(), jsonData, 0644)
+	err = os.WriteFile(filepath.Join(configPath(), configFileName), jsonData, 0644)
 	if err != nil {
 		return err
 	}
@@ -66,6 +106,7 @@ func getConfig() (Config, error) {
 		Status:            GeneralStatus,
 		DateStr:           dateStr,
 		CloudURL:          config.CloudURL,
+		templatePath:      config.TemplatePath,
 	}
 	var configFilePath string
 	configFilePath = ".config"

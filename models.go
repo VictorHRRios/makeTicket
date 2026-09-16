@@ -27,10 +27,11 @@ type VersionFolders struct {
 }
 
 type ConfigFile struct {
-	Projects map[string]Project        `json:"projects"`
-	Versions map[string]VersionFolders `json:"versions"`
-	Current  string                    `json:"current"`
-	CloudURL string                    `json:"cloudURL"`
+	Projects     map[string]Project        `json:"projects"`
+	Versions     map[string]VersionFolders `json:"versions"`
+	Current      string                    `json:"current"`
+	CloudURL     string                    `json:"cloudURL"`
+	TemplatePath string                    `json:"templatePath"`
 }
 
 type Config struct {
@@ -45,4 +46,5 @@ type Config struct {
 	Status            int
 	DateStr           string
 	CloudURL          string
+	templatePath      string
 }
